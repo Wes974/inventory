@@ -19,7 +19,7 @@ func init() {
 	gopath := os.Getenv("GOPATH")
 	paths := filepath.SplitList(gopath)
 	for _, p := range paths {
-		project := filepath.Join(p, "src", "git.exahome.net", "tools", "inventory")
+		project := filepath.Join(p, "src", "github.com", "Wes974", "inventory")
 		info, err := os.Stat(project)
 		if err == nil && info.IsDir() {
 			root = project
