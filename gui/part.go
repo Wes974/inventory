@@ -10,8 +10,8 @@ import (
 
 	"github.com/mbertschler/blocks/html"
 
-	"github.com/mbertschler/inventory/lib/guiapi"
-	"github.com/mbertschler/inventory/parts"
+	"github.com/Wes974/inventory/lib/guiapi"
+	"github.com/Wes974/inventory/parts"
 )
 
 func init() {

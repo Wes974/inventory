@@ -7,9 +7,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/mbertschler/inventory/gui"
-	"github.com/mbertschler/inventory/lib/guiapi"
-	"github.com/mbertschler/inventory/parts"
+	"github.com/Wes974/inventory/gui"
+	"github.com/Wes974/inventory/lib/guiapi"
+	"github.com/Wes974/inventory/parts"
 )
 
 var root string
