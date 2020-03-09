@@ -28,13 +28,13 @@ To build inventory, you have to have Go and `$GOPATH` set up.
 
 ```bash
 # fetch the code
-go get github.com/mbertschler/inventory
+go get github.com/Wes974/inventory
 
 # vendor dependencies
-dep ensure
+cd $GOPATH/src/github.com/Wes974/inventory && dep ensure
 
 # build the command
-go install github.com/mbertschler/inventory
+go install github.com/Wes974/inventory
 
 # run it with the path to the parts database
 inventory ./inventory.db
