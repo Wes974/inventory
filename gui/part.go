@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"strconv"
 	"strings"
 
 	"github.com/mbertschler/blocks/html"
@@ -84,48 +83,12 @@ func editPartBlock(p *parts.Part, code string) html.Block {
 				html.Input(html.Type("Text").Name("Code").Value(p.Code).Class("ga-edit-part")),
 			),
 			html.Div(html.Class("field"),
-				html.Label(nil, html.Text("Name")),
-				html.Input(html.Type("Text").Name("Name").Value(p.Name).Class("ga-edit-part")),
-			),
-			html.Div(html.Class("field"),
-				html.Label(nil, html.Text("Type (R, C, npn Mosfet)")),
-				html.Input(html.Type("Text").Name("Type").Value(p.Type).Class("ga-edit-part")),
-			),
-			html.Div(html.Class("field"),
-				html.Label(nil, html.Text("Value (format: 5.8k, 10, 5u)")),
-				html.Input(html.Type("Text").Name("Value").Value(p.Value).Class("ga-edit-part")),
-			),
-			html.Div(html.Class("field"),
-				html.Label(nil, html.Text("Size")),
-				html.Input(html.Type("Text").Name("Size").Value(p.Size).Class("ga-edit-part")),
-			),
-			html.Div(html.Class("field"),
-				html.Label(nil, html.Text("Serial")),
-				html.Input(html.Type("Text").Name("Serial").Value(p.Serial).Class("ga-edit-part")),
-			),
-			html.Div(html.Class("field"),
-				html.Label(nil, html.Text("Quantity")),
-				html.Input(html.Type("Number").Name("Quantity").Value(p.Quantity).Class("ga-edit-part")),
-			),
-			html.Div(html.Class("field"),
 				html.Label(nil, html.Text("Location")),
 				html.Input(html.Type("Text").Name("Location").Value(p.Location).Class("ga-edit-part")),
 			),
 			html.Div(html.Class("field"),
-				html.Label(nil, html.Text("Parent")),
-				html.Input(html.Type("Text").Name("Parent").Value(p.Parent).Class("ga-edit-part")),
-			),
-			html.Div(html.Class("field"),
-				html.Label(nil, html.Text("Supplier")),
-				html.Input(html.Type("Text").Name("Supplier").Value(p.Supplier).Class("ga-edit-part")),
-			),
-			html.Div(html.Class("field"),
-				html.Label(nil, html.Text("Price (in €, format: 12.3456)")),
-				html.Input(html.Type("Number").Attr("step", "0.01").Name("Price").Value(float64(p.Price)/10000).Class("ga-edit-part")),
-			),
-			html.Div(html.Class("field"),
-				html.Label(nil, html.Text("Delivery (in €, format: 12.3456)")),
-				html.Input(html.Type("Number").Name("Delivery").Value(float64(p.Delivery)/10000).Class("ga-edit-part")),
+				html.Label(nil, html.Text("Family")),
+				html.Input(html.Type("Text").Name("Family").Value(p.Family).Class("ga-edit-part")),
 			),
 		),
 	)
@@ -135,18 +98,9 @@ func savePartAction(args json.RawMessage) (*guiapi.Result, error) {
 	type input struct {
 		ID       string
 		New      string
-		Name     string
-		Type     string
-		Value    string
-		Serial   string
 		Code     string
-		Size     string
-		Quantity string
 		Location string
-		Parent   string
-		Supplier string
-		Price    string
-		Delivery string
+		Family   string
 	}
 	var in input
 	err := json.Unmarshal(args, &in)
@@ -162,36 +116,9 @@ func savePartAction(args json.RawMessage) (*guiapi.Result, error) {
 	if err != nil {
 		return nil, err
 	}
-	p.Name = in.Name
-	p.Type = in.Type
-	p.Value = in.Value
 	p.Code = in.Code
-	p.Serial = in.Serial
-	p.Size = in.Size
 	p.Location = in.Location
-	quant, err := strconv.Atoi(in.Quantity)
-	if err != nil {
-		return nil, err
-	}
-	p.Quantity = quant
-	p.Parent = in.Parent
-	p.Supplier = in.Supplier
-	price, err := strconv.ParseFloat(in.Price, 64)
-	if err != nil {
-		return nil, err
-	}
-	p.Price = int(price * 10000)
-	delivery, err := strconv.ParseFloat(in.Delivery, 64)
-	if err != nil {
-		return nil, err
-	}
-	p.Delivery = int(delivery * 10000)
-
-	// generate name for some parts
-	switch p.Type {
-	case "R", "L", "C", "CP":
-		p.Name = p.Type + p.Size + "_" + p.Value
-	}
+	p.Family = in.Family
 
 	// store part
 	err = parts.Store(p)
@@ -234,13 +161,8 @@ func viewPartAction(args json.RawMessage) (*guiapi.Result, error) {
 func checkoutAction(args json.RawMessage) (*guiapi.Result, error) {
 	var data struct {
 		ID       string
-		Quantity string
 	}
 	err := json.Unmarshal(args, &data)
-	if err != nil {
-		return nil, err
-	}
-	quant, err := strconv.Atoi(data.Quantity)
 	if err != nil {
 		return nil, err
 	}
@@ -248,8 +170,6 @@ func checkoutAction(args json.RawMessage) (*guiapi.Result, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	part.Quantity -= quant
 
 	err = parts.Store(part)
 	if err != nil {
@@ -274,16 +194,8 @@ func viewPartBlock(p *parts.Part) html.Block {
 		)
 	}
 	rows.Add(r("Code", p.Code))
-	rows.Add(r("Type", p.Type))
-	rows.Add(r("Value", p.Value))
-	rows.Add(r("Size", p.Size))
-	rows.Add(r("Serial", p.Serial))
-	rows.Add(r("Quantity", fmt.Sprint(p.Quantity)))
 	rows.Add(r("Location", p.Location))
-	rows.Add(r("Parent", p.Parent))
-	rows.Add(r("Supplier", p.Supplier))
-	rows.Add(r("Price", fmt.Sprintf("%.4f€", float64(p.Price)/10000)))
-	rows.Add(r("Delivery", fmt.Sprintf("%.2f€", float64(p.Delivery)/10000)))
+	rows.Add(r("Family", p.Family))
 
 	return html.Div(nil,
 		html.Div(nil,
@@ -301,16 +213,17 @@ func viewPartBlock(p *parts.Part) html.Block {
 				html.Text("Delete"),
 			),
 		),
-		html.H1(nil, html.Text(p.Name)),
+		html.H1(nil, html.Text(p.Code)),
 		html.Div(html.Class("ui form"),
 			html.Input(html.Type("hidden").Name("ID").Value(p.ID()).Class("ga-checkout")),
+			// TODO: Change checkout ?
 			html.Div(html.Class("field"),
 				html.Label(nil, html.Text("Inventory")),
-				html.Input(html.Type("Text").Value(p.Quantity).Attr("disabled", true)),
+				// html.Input(html.Type("Text").Value(p.Quantity).Attr("disabled", true)),
 			),
 			html.Div(html.Class("field"),
 				html.Label(nil, html.Text("Checkout")),
-				html.Input(html.Type("Text").Name("Quantity").Value("0").Class("ga-checkout")),
+				// html.Input(html.Type("Text").Name("Quantity").Value("0").Class("ga-checkout")),
 			),
 			html.Button(html.Class("ui yellow button").
 				Attr("onclick", "sendForm('checkout', '.ga-checkout')"),

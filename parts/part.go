@@ -31,18 +31,8 @@ func (r Ref) ID() string {
 type Part struct {
 	Ref
 	Code     string
-	Name     string
-	Serial   string
-	Type     string
-	Value    string
-	Size     string
-	Quantity int
 	Location string
-	Parent   string
-
-	Supplier string
-	Price    int
-	Delivery int
+	Family   string
 
 	Values map[string]string
 }
@@ -76,13 +66,8 @@ func Search(query string) ([]*Part, error) {
 	filter := func(p *Part) bool {
 		s := []string{
 			p.Code,
-			p.Name,
-			p.Serial,
-			p.Type,
-			p.Value,
-			p.Size,
 			p.Location,
-			p.Supplier,
+			p.Family,
 		}
 		for _, e := range s {
 			e = strings.ToLower(e)
