@@ -216,15 +216,6 @@ func viewPartBlock(p *parts.Part) html.Block {
 		html.H1(nil, html.Text(p.Code)),
 		html.Div(html.Class("ui form"),
 			html.Input(html.Type("hidden").Name("ID").Value(p.ID()).Class("ga-checkout")),
-			// TODO: Change checkout ?
-			html.Div(html.Class("field"),
-				html.Label(nil, html.Text("Inventory")),
-				// html.Input(html.Type("Text").Value(p.Quantity).Attr("disabled", true)),
-			),
-			html.Div(html.Class("field"),
-				html.Label(nil, html.Text("Checkout")),
-				// html.Input(html.Type("Text").Name("Quantity").Value("0").Class("ga-checkout")),
-			),
 			html.Button(html.Class("ui yellow button").
 				Attr("onclick", "sendForm('checkout', '.ga-checkout')"),
 				html.Text("Checkout Parts"),
